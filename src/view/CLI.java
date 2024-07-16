@@ -9,6 +9,7 @@ import model.Smartphone;
 import services.ProductService;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -97,11 +98,13 @@ public class CLI {
         int quantity = scanner.nextInt();
         scanner.nextLine();
 
-        Product product = productService.getProductById(productId);
-        if (product == null) {
+        Optional<Product> productOptional = productService.getProductById(productId);
+        if (productOptional.isEmpty()) {
             System.out.println("Product not found!");
             return;
         }
+
+        Product product = productOptional.get();
 
         if (product instanceof Smartphone) {
             System.out.print("Do you want to configure the specifications? (yes/no): ");
@@ -124,6 +127,7 @@ public class CLI {
             System.out.println("Error: " + e.getMessage());
         }
     }
+
 
     /**
      * Configures specifications for a smartphone product.

@@ -23,9 +23,10 @@ public class Order implements Serializable {
 
     /**
      * Constructs a new Order object with specified attributes.
-     * @param orderId the unique identifier of the order
-     * @param customerName the name of the customer placing the order
-     * @param customerEmail the email of the customer placing the order
+     *
+     * @param orderId         the unique identifier of the order
+     * @param customerName    the name of the customer placing the order
+     * @param customerEmail   the email of the customer placing the order
      * @param orderedProducts the map of products ordered and their quantities
      */
 
@@ -89,15 +90,14 @@ public class Order implements Serializable {
 
     /**
      * Calculates and returns the total amount (price) of the order based on ordered products and their quantities.
+     *
      * @return the calculated total amount of the order
      */
 
     private double calculateTotalAmount() {
-        double total = 0.0;
-        for (Map.Entry<Product, Integer> entry : orderedProducts.entrySet()) {
-            total += entry.getKey().getPrice() * entry.getValue();
-        }
-        return total;
+        return orderedProducts.entrySet().stream()
+                .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())
+                .sum();
     }
 
     @Override

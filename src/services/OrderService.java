@@ -1,11 +1,10 @@
 package services;
 
+import model.CartItem;
 import model.Order;
 import model.Product;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service class for managing orders, processing orders, and interacting with related services.
@@ -26,12 +25,14 @@ public class OrderService {
     public OrderService() {
         orderPersistenceService = new OrderPersistenceService();
         orders = orderPersistenceService.loadOrders();
-        if (!orders.isEmpty()) {
-            orderCounter = orders.getLast().getOrderId() + 1;
-        }
+        orderCounter = orders.stream()
+                .mapToInt(Order::getOrderId)
+                .max()
+                .orElse(0) + 1;
         invoiceService = new InvoiceService();
         discountService = new DiscountService();
     }
+
 
     public List<Order> getOrders() {
         return orders;
@@ -48,24 +49,34 @@ public class OrderService {
     /**
      * Processes a new order with customer details, cart items, and optional discount code.
      * Generates an invoice, applies discounts if valid, and persists the order.
-     * @param customerName the name of the customer placing the order
+     *
+     * @param customerName  the name of the customer placing the order
      * @param customerEmail the email of the customer placing the order
-     * @param cartItems a map of products and their quantities in the customer's cart
-     * @param discountCode the discount code to apply to the order (can be null)
+     * @param cartItems     a list of CartItem objects representing products and their quantities in the customer's cart
+     * @param discountCode  the discount code to apply to the order (can be null)
      */
 
-    public void processOrder(String customerName, String customerEmail, Map<Product, Integer> cartItems, String discountCode) {
-        Map<Product, Integer> orderedProducts = new HashMap<>(cartItems);
+    public void processOrder(String customerName, String customerEmail, List<CartItem> cartItems, String discountCode) {
+        Map<Product, Integer> orderedProducts = new HashMap<>();
+
+        for (CartItem cartItem : cartItems) {
+            orderedProducts.put(cartItem.getProduct(), cartItem.getQuantity());
+        }
+
         Order order = new Order(orderCounter++, customerName, customerEmail, orderedProducts);
 
-        if (discountCode != null && discountService.isValidDiscountCode(discountCode)) {
-            double discount = discountService.getDiscount(discountCode);
+        Optional<Double> discount = Optional.ofNullable(discountCode)
+                .filter(discountService::isValidDiscountCode)
+                .map(discountService::getDiscount);
+
+        discount.ifPresent(d -> {
             double totalAmount = order.getTotalAmount();
-            order.setTotalAmount(totalAmount - (totalAmount * discount));
-        }
+            order.setTotalAmount(totalAmount - (totalAmount * d));
+        });
 
         orders.add(order);
         invoiceService.generateInvoice(order);
         orderPersistenceService.saveOrders(orders);
     }
+
 }

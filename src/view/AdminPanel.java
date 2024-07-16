@@ -8,6 +8,7 @@ import model.Smartphone;
 import services.ProductService;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -22,8 +23,9 @@ public class AdminPanel {
 
     /**
      * Constructs an AdminPanel with a ProductService and Scanner instance.
+     *
      * @param productService the ProductService instance to manage products
-     * @param scanner the Scanner instance to read user input
+     * @param scanner        the Scanner instance to read user input
      */
 
     public AdminPanel(ProductService productService, Scanner scanner) {
@@ -176,24 +178,26 @@ public class AdminPanel {
         int productId = scanner.nextInt();
         scanner.nextLine();
 
-        Product product = productService.getProductById(productId);
-        if (product != null) {
-            System.out.println("Current Product Details: " + product);
-            System.out.println("Enter New Details:");
+        Optional<Product> productOptional = productService.getProductById(productId);
+        productOptional.ifPresentOrElse(
+                product -> {
+                    System.out.println("Current Product Details: " + product);
+                    System.out.println("Enter New Details:");
 
-            switch (product) {
-                case Computer computer -> updateComputer(computer);
-                case Smartphone smartphone -> updateSmartphone(smartphone);
-                case Electronics electronics -> updateElectronics(electronics);
-                default -> System.out.println("Invalid product type.");
-            }
-        } else {
-            System.out.println("Product not found.");
-        }
+                    switch (product) {
+                        case Computer computer -> updateComputer(computer);
+                        case Smartphone smartphone -> updateSmartphone(smartphone);
+                        case Electronics electronics -> updateElectronics(electronics);
+                        default -> System.out.println("Invalid product type.");
+                    }
+                },
+                () -> System.out.println("Product not found.")
+        );
     }
 
     /**
      * Method to update details of a Computer product based on user input.
+     *
      * @param computer the Computer product to update
      */
 
@@ -222,6 +226,7 @@ public class AdminPanel {
 
     /**
      * Method to update details of a Smartphone product based on user input.
+     *
      * @param smartphone the Smartphone product to update
      */
 
@@ -250,6 +255,7 @@ public class AdminPanel {
 
     /**
      * Method to update details of a Electronics product based on user input.
+     *
      * @param electronics the Electronics product to update
      */
 
@@ -271,6 +277,7 @@ public class AdminPanel {
 
     /**
      * Method to choose a ComputerProcessor from available options.
+     *
      * @return the chosen ComputerProcessor
      */
 
@@ -287,6 +294,7 @@ public class AdminPanel {
 
     /**
      * Method to choose a ComputerRAM from available options.
+     *
      * @return the chosen ComputerRAM
      */
 
@@ -303,6 +311,7 @@ public class AdminPanel {
 
     /**
      * Method to choose a ComputerStorage from available options.
+     *
      * @return the chosen ComputerStorage
      */
 
@@ -319,6 +328,7 @@ public class AdminPanel {
 
     /**
      * Method to choose a SmartphoneColor from available options.
+     *
      * @return the chosen SmartphoneColor
      */
 
@@ -335,6 +345,7 @@ public class AdminPanel {
 
     /**
      * Method to choose a SmartphoneBatteryCapacity from available options.
+     *
      * @return the chosen SmartphoneBatteryCapacity
      */
 
@@ -351,6 +362,7 @@ public class AdminPanel {
 
     /**
      * Method to choose Smartphone accessories from available options.
+     *
      * @return a Set of chosen SmartphoneAccessory
      */
 

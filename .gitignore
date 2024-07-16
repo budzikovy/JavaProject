@@ -3,6 +3,10 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+# Ignore Configuration IntelliJ files
+*.iml
+.idea/
+
 ### Eclipse ###
 .apt_generated
 .classpath

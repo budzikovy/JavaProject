@@ -3,11 +3,13 @@ package services;
 import exceptions.OrderProcessingException;
 import exceptions.ProductOutOfStockException;
 import model.Cart;
+import model.CartItem;
 import model.Order;
 import model.Product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for managing products, carts, and order processing.
@@ -44,7 +46,6 @@ public class ProductService {
         return products.removeIf(product -> product.getId() == productId);
     }
 
-
     public List<Product> viewProducts() {
         return products;
     }
@@ -52,16 +53,13 @@ public class ProductService {
     /**
      * Retrieves a product from the list based on its ID.
      * @param productId the ID of the product to retrieve
-     * @return the product with the specified ID, or null if not found
+     * @return an Optional containing the product with the specified ID, or an empty Optional if not found
      */
 
-    public Product getProductById(int productId) {
-        for (Product product : products) {
-            if (product.getId() == productId) {
-                return product;
-            }
-        }
-        return null;
+    public Optional<Product> getProductById(int productId) {
+        return products.stream()
+                .filter(product -> product.getId() == productId)
+                .findFirst();
     }
 
     /**
@@ -73,13 +71,18 @@ public class ProductService {
      */
 
     public void addProductToCart(int productId, int quantity) throws ProductOutOfStockException {
-        Product product = getProductById(productId);
-        if (product != null && quantity <= product.getAvailableQuant()) {
-            cart.addProductToCart(product, quantity);
-            product.setAvailableQuant(product.getAvailableQuant() - quantity);
-            System.out.println("Product added to cart: " + product + " | Quantity: " + quantity);
+        Optional<Product> productOptional = getProductById(productId);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            if (quantity <= product.getAvailableQuant()) {
+                cart.addProductToCart(product, quantity);
+                product.setAvailableQuant(product.getAvailableQuant() - quantity);
+                System.out.println("Product added to cart: " + product + " | Quantity: " + quantity);
+            } else {
+                throw new ProductOutOfStockException("Product is out of stock or you provided a quantity larger than the available stock.");
+            }
         } else {
-            throw new ProductOutOfStockException("Product is out of stock or you provided a quantity larger than the available stock.");
+            throw new ProductOutOfStockException("Product not found with ID: " + productId);
         }
     }
 
@@ -97,18 +100,17 @@ public class ProductService {
      */
 
     public void placeOrder(String customerName, String customerEmail, String discountCode) throws OrderProcessingException {
-        if (cart.getCartItems().isEmpty()) {
+        List<CartItem> cartItems = cart.getCartItems();
+        if (cartItems.isEmpty()) {
             throw new OrderProcessingException("Cart is empty. Add something to the cart.");
         } else {
-            orderService.processOrder(customerName, customerEmail, cart.getCartItems(), discountCode);
+            orderService.processOrder(customerName, customerEmail, cartItems, discountCode);
         }
         cart.clearCart();
     }
 
     public void viewOrders() {
         System.out.println("\nViewing Orders:");
-        for (Order order : orderService.getOrders()) {
-            System.out.println(order);
-        }
+        orderService.getOrders().forEach(System.out::println);
     }
 }
