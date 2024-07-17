@@ -1,5 +1,7 @@
 package model;
 
+
+//    Zmiany
 /**
  * Represents an item in the cart, which includes a product and its quantity.
  */

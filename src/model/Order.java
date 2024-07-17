@@ -94,6 +94,7 @@ public class Order implements Serializable {
      * @return the calculated total amount of the order
      */
 
+//    Zmiany
     private double calculateTotalAmount() {
         return orderedProducts.entrySet().stream()
                 .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())

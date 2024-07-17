@@ -22,6 +22,8 @@ public class Cart {
      * @param product  the product to add to the cart
      * @param quantity the quantity of the product to add
      */
+
+//    Zmiany
     public void addProductToCart(Product product, int quantity) {
         Optional<CartItem> existingItem = cartItems.stream()
                 .filter(item -> item.getProduct().equals(product))

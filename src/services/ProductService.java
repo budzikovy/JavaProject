@@ -56,6 +56,8 @@ public class ProductService {
      * @return an Optional containing the product with the specified ID, or an empty Optional if not found
      */
 
+
+//    Zmiany
     public Optional<Product> getProductById(int productId) {
         return products.stream()
                 .filter(product -> product.getId() == productId)
@@ -70,6 +72,7 @@ public class ProductService {
      * @throws ProductOutOfStockException if the product is out of stock or quantity exceeds available stock
      */
 
+//    Zmiany
     public void addProductToCart(int productId, int quantity) throws ProductOutOfStockException {
         Optional<Product> productOptional = getProductById(productId);
         if (productOptional.isPresent()) {
