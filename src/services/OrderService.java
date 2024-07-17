@@ -22,6 +22,7 @@ public class OrderService {
      * Constructs an OrderService instance, initializing necessary services and loading existing orders.
      */
 
+//    Zmiany
     public OrderService() {
         orderPersistenceService = new OrderPersistenceService();
         orders = orderPersistenceService.loadOrders();
@@ -56,6 +57,7 @@ public class OrderService {
      * @param discountCode  the discount code to apply to the order (can be null)
      */
 
+//    Zmiany
     public void processOrder(String customerName, String customerEmail, List<CartItem> cartItems, String discountCode) {
         Map<Product, Integer> orderedProducts = new HashMap<>();
 
